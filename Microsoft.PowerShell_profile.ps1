@@ -292,14 +292,66 @@ if (Get-Command zoxide -ErrorAction SilentlyContinue) {
 }
 
 function Show-Functions {
-    Write-Output "Available custom functions:"
-    Get-ChildItem Function:\ |
-        Where-Object { 
-            # Exclude functions that are part of any recognized module or are common PowerShell cmdlets
-            -not $_.ModuleName -and
-            $_.Name -notmatch "^(Get|Set|Remove|New|Invoke|Show|Update)-" 
-        } |
-        Select-Object -ExpandProperty Name |
-        Sort-Object |
-        ForEach-Object { Write-Output " - $_" }
+    Write-Host "Available custom functions with descriptions:" -ForegroundColor Cyan
+
+    # Profile Management
+    Write-Host "`nProfile Management:" -ForegroundColor Green
+    Write-Output "  - Update-Profile: Checks and updates the PowerShell profile from GitHub if a new version is detected."
+    Write-Output "  - Edit-Profile: Opens the current user's all hosts profile in the default editor."
+    Write-Output "  - reload-profile: Reloads the PowerShell profile."
+    Write-Output "  - Update-PowerShell: Checks for the latest version of PowerShell and updates it if a newer version is available."
+
+    # System Utilities
+    Write-Host "`nSystem Utilities:" -ForegroundColor Green
+    Write-Output "  - uptime: Shows the system uptime."
+    Write-Output "  - sysinfo: Retrieves detailed system information."
+
+    # Network Utilities
+    Write-Host "`nNetwork Utilities:" -ForegroundColor Green
+    Write-Output "  - Get-PubIP: Retrieves the public IP address of the current connection."
+    Write-Output "  - flushdns: Clears the DNS client cache."
+
+    # File Management
+    Write-Host "`nFile Management:" -ForegroundColor Green
+    Write-Output "  - unzip: Extracts a zip file to the current directory."
+    Write-Output "  - grep: Searches for patterns matching a specified regex in files or standard input."
+    Write-Output "  - df: Displays disk space usage for all mounted drives."
+    Write-Output "  - sed: Replaces text in a specified file."
+    Write-Output "  - which: Finds the location of a command."
+    Write-Output "  - head: Displays the first 'n' lines of a file."
+    Write-Output "  - tail: Displays the last 'n' lines of a file."
+    Write-Output "  - nf: Creates a new file in the current directory."
+    Write-Output "  - mkcd: Creates a new directory and changes to it."
+
+    # Process Management
+    Write-Host "`nProcess Management:" -ForegroundColor Green
+    Write-Output "  - pkill: Terminates processes with the specified name."
+    Write-Output "  - pgrep: Lists all processes with the specified name."
+    Write-Output "  - k9: Force stops a process by name."
+
+    # Git Utilities
+    Write-Host "`nGit Utilities:" -ForegroundColor Green
+    Write-Output "  - gs: Runs the 'git status' command."
+    Write-Output "  - ga: Stages all changes in git."
+    Write-Output "  - gc: Commits staged changes in git with a provided message."
+    Write-Output "  - gp: Pushes committed changes to the remote git repository."
+    Write-Output "  - g: Navigates to the GitHub directory."
+    Write-Output "  - gcom: Stages and commits all changes in git with a specified message."
+    Write-Output "  - lazyg: Stages, commits, and pushes all changes in git with a specified message."
+
+    # Clipboard Utilities
+    Write-Host "`nClipboard Utilities:" -ForegroundColor Green
+    Write-Output "  - cpy: Copies the specified text to the clipboard."
+    Write-Output "  - pst: Retrieves the current content of the clipboard."
+
+    # Navigation Shortcuts
+    Write-Host "`nNavigation Shortcuts:" -ForegroundColor Green
+    Write-Output "  - docs: Navigates to the Documents folder."
+    Write-Output "  - dtop: Navigates to the Desktop folder."
+    Write-Output "  - ep: Opens the current PowerShell profile in the default editor."
+
+    # Listing and Formatting
+    Write-Host "`nListing and Formatting:" -ForegroundColor Green
+    Write-Output "  - la: Lists all items in the current directory including hidden ones, formatted as a table."
+    Write-Output "  - ll: Lists all items including hidden ones, providing detailed information."
 }
