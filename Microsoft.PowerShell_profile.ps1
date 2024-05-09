@@ -65,7 +65,7 @@ Update-Profile
 function Update-PowerShell {
     # Only proceed if PowerShell version is 7 or higher
     if ($PSVersionTable.PSVersion.Major -lt 7) {
-        Write-Host "This script is intended for PowerShell Core 7 or newer." -ForegroundColor Yellow
+        # Write-Host "This function is intended for PowerShell Core 7 or newer." -ForegroundColor Yellow
         return
     }
 
