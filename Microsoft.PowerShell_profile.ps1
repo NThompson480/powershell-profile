@@ -11,7 +11,6 @@ if ($PSVersion -ge 6) {
     $canConnectToGitHub = Test-Connection github.com -Count 1 -Quiet
 }
 
-
 # Import Modules and External Profiles
 # Ensure Terminal-Icons module is installed before importing
 if (-not (Get-Module -ListAvailable -Name Terminal-Icons)) {
@@ -30,19 +29,35 @@ function Update-Profile {
         return
     }
 
+    Write-Host "Initiating profile update check..." -ForegroundColor Cyan
+
     try {
         $url = "https://raw.githubusercontent.com/NThompson480/powershell-profile/main/Microsoft.PowerShell_profile.ps1"
-        $oldhash = Get-FileHash $PROFILE
+        Write-Host "Downloading the latest profile from GitHub..." -ForegroundColor Cyan
+        $oldhash = Get-FileHash $PROFILE -ErrorAction SilentlyContinue
+        if ($oldhash) {
+            Write-Host "Current profile hash: $($oldhash.Hash)" -ForegroundColor Gray
+        } else {
+            Write-Host "No existing profile hash found (possibly new installation)." -ForegroundColor Yellow
+        }
+
         Invoke-RestMethod $url -OutFile "$env:temp/Microsoft.PowerShell_profile.ps1"
         $newhash = Get-FileHash "$env:temp/Microsoft.PowerShell_profile.ps1"
+        Write-Host "Latest profile hash: $($newhash.Hash)" -ForegroundColor Gray
+
         if ($newhash.Hash -ne $oldhash.Hash) {
+            Write-Host "A new version of the profile has been detected. Updating profile..." -ForegroundColor Yellow
             Copy-Item -Path "$env:temp/Microsoft.PowerShell_profile.ps1" -Destination $PROFILE -Force
-            Write-Host "Profile has been updated. Please restart your shell to reflect changes" -ForegroundColor Magenta
+            Write-Host "Profile has been updated successfully. Please restart your shell to reflect changes." -ForegroundColor Magenta
+        } else {
+            Write-Host "Your PowerShell profile is already up to date." -ForegroundColor Green
         }
     } catch {
-        Write-Error "Unable to check for `$profile updates"
+        Write-Error "Failed to check or update profile. Error: $_"
     } finally {
+        Write-Host "Cleaning up temporary files..." -ForegroundColor Cyan
         Remove-Item "$env:temp/Microsoft.PowerShell_profile.ps1" -ErrorAction SilentlyContinue
+        Write-Host "Cleanup complete." -ForegroundColor Green
     }
 }
 Update-Profile
