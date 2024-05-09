@@ -30,24 +30,26 @@ function Update-Profile {
     }
 
     Write-Host "Initiating profile update check..." -ForegroundColor Cyan
+    $tempFile = "$env:temp/Microsoft.PowerShell_profile.ps1"
 
     try {
         $url = "https://raw.githubusercontent.com/NThompson480/powershell-profile/main/Microsoft.PowerShell_profile.ps1"
         Write-Host "Downloading the latest profile from GitHub..." -ForegroundColor Cyan
         $oldhash = Get-FileHash $PROFILE -ErrorAction SilentlyContinue
+
         if ($oldhash) {
             Write-Host "Current profile hash: $($oldhash.Hash)" -ForegroundColor Gray
         } else {
             Write-Host "No existing profile hash found (possibly new installation)." -ForegroundColor Yellow
         }
 
-        Invoke-RestMethod $url -OutFile "$env:temp/Microsoft.PowerShell_profile.ps1"
-        $newhash = Get-FileHash "$env:temp/Microsoft.PowerShell_profile.ps1"
+        Invoke-RestMethod $url -OutFile $tempFile
+        $newhash = Get-FileHash $tempFile
         Write-Host "Latest profile hash: $($newhash.Hash)" -ForegroundColor Gray
 
         if ($newhash.Hash -ne $oldhash.Hash) {
             Write-Host "A new version of the profile has been detected. Updating profile..." -ForegroundColor Yellow
-            Copy-Item -Path "$env:temp/Microsoft.PowerShell_profile.ps1" -Destination $PROFILE -Force
+            Copy-Item -Path $tempFile -Destination $PROFILE -Force
             Write-Host "Profile has been updated successfully. Please restart your shell to reflect changes." -ForegroundColor Magenta
         } else {
             Write-Host "Your PowerShell profile is already up to date." -ForegroundColor Green
@@ -55,9 +57,13 @@ function Update-Profile {
     } catch {
         Write-Error "Failed to check or update profile. Error: $_"
     } finally {
-        Write-Host "Cleaning up temporary files..." -ForegroundColor Cyan
-        Remove-Item "$env:temp/Microsoft.PowerShell_profile.ps1" -ErrorAction SilentlyContinue
-        Write-Host "Cleanup complete." -ForegroundColor Green
+        if (Test-Path $tempFile) {
+            Write-Host "Cleaning up temporary files..." -ForegroundColor Cyan
+            Remove-Item $tempFile -ErrorAction SilentlyContinue
+            Write-Host "Cleanup complete." -ForegroundColor Green
+        } else {
+            Write-Host "No temporary files to clean up." -ForegroundColor Green
+        }
     }
 }
 Update-Profile
