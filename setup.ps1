@@ -114,8 +114,17 @@ catch {
     Write-Error "Failed to download or install the Cascadia Code font. Error: $_"
 }
 
+# Function to check if a package is installed via Chocolatey
+function Test-ChocolateyPackageInstalled {
+    param (
+        [string]$packageName
+    )
+    $installedPackages = choco list --local-only
+    return $installedPackages -like "*$packageName*"
+}
+
 # Final check and message to the user
-if ((Test-Path -Path $PROFILE) -and (winget list --name "OhMyPosh" -e) -and ($fontFamilies -contains "CaskaydiaCove NF")) {
+if ((Test-Path -Path $PROFILE) -and (Test-ChocolateyPackageInstalled -packageName "oh-my-posh") -and ($fontFamilies -contains "CaskaydiaCove NF")) {
     Write-Host "Setup completed successfully. Please restart your PowerShell session to apply changes."
 } else {
     Write-Warning "Setup completed with errors. Please check the error messages above."
