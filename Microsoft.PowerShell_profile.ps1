@@ -68,20 +68,20 @@ function Update-PowerShell {
         return
     }
 
+    Write-Host "Checking for PowerShell updates..." -ForegroundColor Cyan
+
     try {
-        Write-Host "Checking for PowerShell updates..." -ForegroundColor Cyan
-        $updateNeeded = $false
-        $currentVersion = $PSVersionTable.PSVersion.ToString()
         $gitHubApiUrl = "https://api.github.com/repos/PowerShell/PowerShell/releases/latest"
         $latestReleaseInfo = Invoke-RestMethod -Uri $gitHubApiUrl
         $latestVersion = $latestReleaseInfo.tag_name.Trim('v')
-        if ($currentVersion -lt $latestVersion) {
-            $updateNeeded = $true
-        }
+        $currentVersion = $PSVersionTable.PSVersion.ToString()
 
-        if ($updateNeeded) {
+        Write-Host "Current version: $currentVersion" -ForegroundColor Green
+        Write-Host "Latest version: $latestVersion" -ForegroundColor Green
+
+        if ($currentVersion -lt $latestVersion) {
             Write-Host "Downloading the latest PowerShell..." -ForegroundColor Yellow
-            $asset = $latestReleaseInfo.assets | Where-Object { $_.name -like "*win-x64.msi" } # Assuming Windows 64-bit MSI installer
+            $asset = $latestReleaseInfo.assets | Where-Object { $_.name -like "*win-x64.msi" }
             $downloadUrl = $asset.browser_download_url
             $localPath = "$env:TEMP\PowerShell-latest.msi"
             Invoke-WebRequest -Uri $downloadUrl -OutFile $localPath
