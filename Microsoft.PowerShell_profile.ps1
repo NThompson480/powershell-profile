@@ -65,9 +65,16 @@ function Update-PowerShell {
         }
 
         if ($updateNeeded) {
-            Write-Host "Updating PowerShell..." -ForegroundColor Yellow
-            winget upgrade "Microsoft.PowerShell" --accept-source-agreements --accept-package-agreements
-            Write-Host "PowerShell has been updated. Please restart your shell to reflect changes" -ForegroundColor Magenta
+            Write-Host "Downloading the latest PowerShell..." -ForegroundColor Yellow
+            $asset = $latestReleaseInfo.assets | Where-Object { $_.name -like "*win-x64.msi" } # Assuming Windows 64-bit MSI installer
+            $downloadUrl = $asset.browser_download_url
+            $localPath = "$env:TEMP\PowerShell-latest.msi"
+            Invoke-WebRequest -Uri $downloadUrl -OutFile $localPath
+
+            Write-Host "Installing the latest PowerShell..." -ForegroundColor Yellow
+            Start-Process msiexec.exe -ArgumentList "/i `"$localPath`" /quiet /norestart" -Wait
+
+            Write-Host "PowerShell has been updated. Please restart your shell to reflect changes." -ForegroundColor Magenta
         } else {
             Write-Host "Your PowerShell is up to date." -ForegroundColor Green
         }
@@ -76,7 +83,6 @@ function Update-PowerShell {
     }
 }
 Update-PowerShell
-
 
 # Admin Check and Prompt Customization
 $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
