@@ -28,12 +28,20 @@ function Get-DateTimeStamp {
 
 # Profile creation or update
 if (!(Test-Path -Path $PROFILE -PathType Leaf)) {
-    $profilePath = $PSVersionTable.PSEdition -eq "Core" ? "$env:userprofile\Documents\Powershell" : "$env:userprofile\Documents\WindowsPowerShell"
+    # Set the profile path based on the PowerShell edition
+    if ($PSVersionTable.PSEdition -eq "Core") {
+        $profilePath = "$env:userprofile\Documents\Powershell"
+    } else {
+        $profilePath = "$env:userprofile\Documents\WindowsPowerShell"
+    }
+
+    # Create the profile directory if it does not exist
     if (!(Test-Path -Path $profilePath)) {
         New-Item -Path $profilePath -ItemType Directory
     }
 
     try {
+        # Download and save the PowerShell profile from GitHub
         Invoke-RestMethod "https://github.com/NThompson480/powershell-profile/raw/main/Microsoft.PowerShell_profile.ps1" -OutFile $PROFILE
         Write-Host "The profile @ [$PROFILE] has been created. Please add any persistent components to [$profilePath\Profile.ps1]."
     }
@@ -41,6 +49,7 @@ if (!(Test-Path -Path $PROFILE -PathType Leaf)) {
         Write-Error "Failed to create the profile. Error: $_"
     }
 }
+
 else {
     try {
         $dateTimeStamp = Get-DateTimeStamp
