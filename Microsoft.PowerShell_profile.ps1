@@ -121,12 +121,6 @@ $adminSuffix = if ($isAdmin) { " [ADMIN]" } else { "" }
 $Host.UI.RawUI.WindowTitle = "PowerShell {0}$adminSuffix" -f $PSVersionTable.PSVersion.ToString()
 
 # Utility Functions
-function Show-Functions {
-    $customFunctions = Get-ChildItem Function:\ | Where-Object { $_.ModuleName -eq $null } | Select-Object -ExpandProperty Name
-    Write-Output "Available custom functions:"
-    $customFunctions | Sort-Object | ForEach-Object { Write-Output " - $_" }
-}
-
 function Test-CommandExists {
     param($command)
     $exists = $null -ne (Get-Command $command -ErrorAction SilentlyContinue)
@@ -297,3 +291,15 @@ if (Get-Command zoxide -ErrorAction SilentlyContinue) {
     }
 }
 
+function Show-Functions {
+    Write-Output "Available custom functions:"
+    Get-ChildItem Function:\ |
+        Where-Object { 
+            # Exclude functions that are part of any recognized module or are common PowerShell cmdlets
+            -not $_.ModuleName -and
+            $_.Name -notmatch "^(Get|Set|Remove|New|Invoke|Show|Update)-" 
+        } |
+        Select-Object -ExpandProperty Name |
+        Sort-Object |
+        ForEach-Object { Write-Output " - $_" }
+}
