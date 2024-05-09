@@ -63,25 +63,32 @@ function Update-Profile {
 Update-Profile
 
 function Update-PowerShell {
+    # Only proceed if PowerShell version is 7 or higher
+    if ($PSVersionTable.PSVersion.Major -lt 7) {
+        Write-Host "This script is intended for PowerShell Core 7 or newer." -ForegroundColor Yellow
+        return
+    }
+
     if (-not $global:canConnectToGitHub) {
         Write-Host "Skipping PowerShell update check due to GitHub.com not responding within 1 second." -ForegroundColor Yellow
         return
     }
 
-    Write-Host "Checking for PowerShell updates..." -ForegroundColor Cyan
-
     try {
+        Write-Host "Checking for PowerShell updates..." -ForegroundColor Cyan
+        $updateNeeded = $false
+        $currentVersion = $PSVersionTable.PSVersion.ToString()
         $gitHubApiUrl = "https://api.github.com/repos/PowerShell/PowerShell/releases/latest"
         $latestReleaseInfo = Invoke-RestMethod -Uri $gitHubApiUrl
         $latestVersion = $latestReleaseInfo.tag_name.Trim('v')
-        $currentVersion = $PSVersionTable.PSVersion.ToString()
-
-        Write-Host "Current version: $currentVersion" -ForegroundColor Green
-        Write-Host "Latest version: $latestVersion" -ForegroundColor Green
 
         if ($currentVersion -lt $latestVersion) {
+            $updateNeeded = $true
+        }
+
+        if ($updateNeeded) {
             Write-Host "Downloading the latest PowerShell..." -ForegroundColor Yellow
-            $asset = $latestReleaseInfo.assets | Where-Object { $_.name -like "*win-x64.msi" }
+            $asset = $latestReleaseInfo.assets | Where-Object { $_.name -like "*win-x64.msi" } # Assuming Windows 64-bit MSI installer
             $downloadUrl = $asset.browser_download_url
             $localPath = "$env:TEMP\PowerShell-latest.msi"
             Invoke-WebRequest -Uri $downloadUrl -OutFile $localPath
