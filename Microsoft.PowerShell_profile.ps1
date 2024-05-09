@@ -121,7 +121,7 @@ $adminSuffix = if ($isAdmin) { " [ADMIN]" } else { "" }
 $Host.UI.RawUI.WindowTitle = "PowerShell {0}$adminSuffix" -f $PSVersionTable.PSVersion.ToString()
 
 # Utility Functions
-function List-Functions {
+function Show-Functions {
     $customFunctions = Get-ChildItem Function:\ | Where-Object { $_.ModuleName -eq $null } | Select-Object -ExpandProperty Name
     Write-Output "Available custom functions:"
     $customFunctions | Sort-Object | ForEach-Object { Write-Output " - $_" }
