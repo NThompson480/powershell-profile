@@ -57,13 +57,33 @@ else {
     }
 }
 
-# OMP Install
+# Choco install
 try {
-    winget install -e --accept-source-agreements --accept-package-agreements JanDeDobbeleer.OhMyPosh
+    Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 }
 catch {
-    Write-Error "Failed to install Oh My Posh. Error: $_"
+    Write-Error "Failed to install Chocolatey. Error: $_"
 }
+
+# Chocolatey install function
+function Install-ChocolateyPackage {
+    param(
+        [string]$packageName
+    )
+    try {
+        choco install $packageName -y
+        Write-Host "$packageName installed successfully using Chocolatey."
+    }
+    catch {
+        Write-Error "Failed to install $packageName. Error: $_"
+    }
+}
+
+# Oh My Posh Install using Chocolatey
+Install-ChocolateyPackage -packageName "oh-my-posh"
+
+# zoxide Install using Chocolatey
+Install-ChocolateyPackage -packageName "zoxide"
 
 # Font Install
 try {
@@ -101,26 +121,10 @@ if ((Test-Path -Path $PROFILE) -and (winget list --name "OhMyPosh" -e) -and ($fo
     Write-Warning "Setup completed with errors. Please check the error messages above."
 }
 
-# Choco install
-try {
-    Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-}
-catch {
-    Write-Error "Failed to install Chocolatey. Error: $_"
-}
-
 # Terminal Icons Install
 try {
     Install-Module -Name Terminal-Icons -Repository PSGallery -Force
 }
 catch {
     Write-Error "Failed to install Terminal Icons module. Error: $_"
-}
-# zoxide Install
-try {
-    winget install -e --id ajeetdsouza.zoxide
-    Write-Host "zoxide installed successfully."
-}
-catch {
-    Write-Error "Failed to install zoxide. Error: $_"
 }
