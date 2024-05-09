@@ -23,7 +23,7 @@ if (Test-Path($ChocolateyProfile)) {
 }
 
 # Check for Profile Updates
-function Update-Profile {
+function update-profile {
     if (-not $global:canConnectToGitHub) {
         Write-Host "Skipping profile update check due to GitHub.com not responding within 1 second." -ForegroundColor Yellow
         return
@@ -66,9 +66,9 @@ function Update-Profile {
         }
     }
 }
-Update-Profile
+update-profile
 
-function Update-PowerShell {
+function update-powershell {
     # Only proceed if PowerShell version is 7 or higher
     if ($PSVersionTable.PSVersion.Major -lt 7) {
         # Write-Host "This function is intended for PowerShell Core 7 or newer." -ForegroundColor Yellow
@@ -110,7 +110,7 @@ function Update-PowerShell {
         Write-Error "Failed to update PowerShell. Error: $_"
     }
 }
-Update-PowerShell
+update-powershell
 
 # Admin Check and Prompt Customization
 $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
@@ -120,8 +120,7 @@ function prompt {
 $adminSuffix = if ($isAdmin) { " [ADMIN]" } else { "" }
 $Host.UI.RawUI.WindowTitle = "PowerShell {0}$adminSuffix" -f $PSVersionTable.PSVersion.ToString()
 
-
-function Edit-Profile {
+function edit-profile {
     vim $PROFILE.CurrentUserAllHosts
 }
 
@@ -147,7 +146,7 @@ function sysinfo {
 }
 
 # Network Utilities
-function Get-PubIP {
+function get-pubip {
     (Invoke-WebRequest http://ifconfig.me/ip).Content
 }
 
@@ -267,10 +266,10 @@ function Show-Functions {
 
     # Profile Management
     Write-Host "`nProfile Management:" -ForegroundColor Green
-    Write-Output "  - Update-Profile: Checks and updates the PowerShell profile from GitHub if a new version is detected."
-    Write-Output "  - Edit-Profile: Opens the current user's all hosts profile in the default editor."
+    Write-Output "  - update-profile: Checks and updates the PowerShell profile from GitHub if a new version is detected."
+    Write-Output "  - edit-profile: Opens the current user's all hosts profile in the default editor."
     Write-Output "  - reload-profile: Reloads the PowerShell profile."
-    Write-Output "  - Update-PowerShell: Checks for the latest version of PowerShell and updates it if a newer version is available."
+    Write-Output "  - update-powershell: Checks for the latest version of PowerShell and updates it if a newer version is available."
 
     # System Utilities
     Write-Host "`nSystem Utilities:" -ForegroundColor Green
@@ -279,7 +278,7 @@ function Show-Functions {
 
     # Network Utilities
     Write-Host "`nNetwork Utilities:" -ForegroundColor Green
-    Write-Output "  - Get-PubIP: Retrieves the public IP address of the current connection."
+    Write-Output "  - get-pubip: Retrieves the public IP address of the current connection."
     Write-Output "  - flushdns: Clears the DNS client cache."
 
     # File Management
