@@ -202,7 +202,7 @@ function Ensure-TerminalIconsInstalled {
 Ensure-TerminalIconsInstalled
 
 # Final check and message to the user
-if ((Test-Path -Path $PROFILE) -and (Test-ChocolateyPackageInstalled -packageName "oh-my-posh") -and ($fontFamilies -contains "CaskaydiaCove NF")) {
+if ((Test-Path -Path $PROFILE) -and (Test-ChocolateyPackageInstalled -packageName "oh-my-posh")) {
     Write-Host "Setup completed successfully. Please restart your PowerShell session to apply changes."
 } else {
     Write-Warning "Setup completed with errors. Please check the error messages above."
