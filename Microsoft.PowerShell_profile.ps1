@@ -311,20 +311,6 @@ if (-Not (Test-Path $localConfigPath)) {
 }
 oh-my-posh init pwsh --config $localConfigPath | Invoke-Expression
 
-# Check for the zoxide command, install with Chocolatey if not found
-if (Get-Command zoxide -ErrorAction SilentlyContinue) {
-    Invoke-Expression (& { (zoxide init powershell | Out-String) })
-} else {
-    Write-Host "zoxide command not found. Attempting to install via Chocolatey..."
-    try {
-        choco install zoxide -y
-        Write-Host "zoxide installed successfully. Initializing..."
-        Invoke-Expression (& { (zoxide init powershell | Out-String) })
-    } catch {
-        Write-Error "Failed to install zoxide. Error: $_"
-    }
-}
-
 function ShowFunctions {
     Write-Host "Available custom functions with descriptions:" -ForegroundColor Cyan
 
