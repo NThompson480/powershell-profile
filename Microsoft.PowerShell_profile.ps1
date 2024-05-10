@@ -278,8 +278,14 @@ Set-PSReadLineOption -Colors @{
     String = 'DarkCyan'
 }
 
-## Final Line to set prompt
-oh-my-posh init pwsh --config https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/cinnamon.omp.json | Invoke-Expression
+## Set prompt
+$themeFileName = "oh-my-posh-cinnamon.json"
+$localConfigPath = Join-Path (Split-Path -Parent $PROFILE) $themeFileName
+if (-Not (Test-Path $localConfigPath)) {
+    Invoke-WebRequest "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/$themeFileName" -OutFile $localConfigPath
+    Write-Host "Downloaded and saved config to $localConfigPath" -ForegroundColor Green
+}
+oh-my-posh init pwsh --config $localConfigPath | Invoke-Expression
 
 # Check for the zoxide command, install with Chocolatey if not found
 if (Get-Command zoxide -ErrorAction SilentlyContinue) {
