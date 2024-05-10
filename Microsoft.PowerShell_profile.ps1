@@ -54,12 +54,11 @@ function UpdateProfile {
         return
     }
 
-    Write-Host "Initiating profile update check..." -ForegroundColor Cyan
+    Write-Host "Initiating profile update check from GitHub......" -ForegroundColor Cyan
     $tempFile = "$env:temp/Microsoft.PowerShell_profile.ps1"
 
     try {
         $url = "https://raw.githubusercontent.com/NThompson480/powershell-profile/main/Microsoft.PowerShell_profile.ps1"
-        Write-Host "Verifying the latest profile from GitHub..." -ForegroundColor Cyan
         $oldhash = Get-FileHash $PROFILE -ErrorAction SilentlyContinue
 
         if ($oldhash) {
