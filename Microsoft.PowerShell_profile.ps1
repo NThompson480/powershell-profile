@@ -59,7 +59,7 @@ function UpdateProfile {
     if ($timeSinceUpdate.TotalDays -lt 1 -and -not $ForceUpdate) {
         $hours = [Math]::Floor($timeSinceUpdate.TotalHours)
         $minutes = [Math]::Floor($timeSinceUpdate.TotalMinutes) % 60
-        Write-Host "Your PowerShell profile was last updated $hours hour(s) and $minutes minute(s) ago. You can issue an 'UpdateProfile -ForceUpdate' to check GitHub again now." -ForegroundColor Green
+        Write-Host "PowerShell profile last updated $hours hour(s) and $minutes minute(s) ago. Use 'ReloadProfile' to check GitHub again now." -ForegroundColor Green
         return
     }
 
@@ -148,6 +148,7 @@ function EditProfile {
 }
 
 function ReloadProfile {
+    UpdateProfile -ForceUpdate
     & $profile
 }
 
