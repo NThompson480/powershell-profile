@@ -172,6 +172,14 @@ function FlushDNS {
 }
 
 # File Management
+function touch($file) { "" | Out-File $file -Encoding ASCII }
+
+function ff($name) {
+    Get-ChildItem -recurse -filter "*${name}*" -ErrorAction SilentlyContinue | ForEach-Object {
+        Write-Output "$($_.directory)\$($_)"
+    }
+}
+
 function unzip($file) {
     $fullPath = Resolve-Path $file
     Expand-Archive -Path $fullPath -DestinationPath $PWD
@@ -288,64 +296,65 @@ function ShowFunctions {
 
     # Profile Management
     Write-Host "`nProfile Management:" -ForegroundColor Green
-    Write-Output "  - UpdateProfile: Checks and updates the PowerShell profile from GitHub if a new version is detected."
-    Write-Output "  - EditProfile: Opens the current user's all hosts profile in the default editor."
-    Write-Output "  - ReloadProfile: Reloads the PowerShell profile."
-    Write-Output "  - UpdatePowershell: Checks for the latest version of PowerShell and updates it if a newer version is available."
+    Write-Output "  - UpdateProfile: Checks and updates the PowerShell profile from GitHub. Usage: UpdateProfile"
+    Write-Output "  - EditProfile: Opens the current user's all hosts profile in the default editor. Usage: EditProfile"
+    Write-Output "  - ReloadProfile: Reloads the PowerShell profile. Usage: ReloadProfile"
+    Write-Output "  - UpdatePowerShell: Checks and updates PowerShell if a newer version is available. Usage: UpdatePowerShell"
 
     # System Utilities
     Write-Host "`nSystem Utilities:" -ForegroundColor Green
-    Write-Output "  - Uptime: Shows the system uptime."
-    Write-Output "  - Sysinfo: Retrieves detailed system information."
+    Write-Output "  - Uptime: Shows system uptime since the last boot. Usage: Uptime"
+    Write-Output "  - Sysinfo: Retrieves detailed system information. Usage: Sysinfo"
 
     # Network Utilities
     Write-Host "`nNetwork Utilities:" -ForegroundColor Green
-    Write-Output "  - GetPublicIP: Retrieves the public IP address of the current connection."
-    Write-Output "  - FlushDNS: Clears the DNS client cache."
+    Write-Output "  - GetPublicIP: Retrieves the public IP address. Usage: GetPublicIP"
+    Write-Output "  - FlushDNS: Clears the DNS client cache. Usage: FlushDNS"
 
     # File Management
     Write-Host "`nFile Management:" -ForegroundColor Green
-    Write-Output "  - vim: Open a file in text editor."
-    Write-Output "  - unzip: Extracts a zip file to the current directory."
-    Write-Output "  - grep: Searches for patterns matching a specified regex in files or standard input."
-    Write-Output "  - df: Displays disk space usage for all mounted drives."
-    Write-Output "  - sed: Replaces text in a specified file."
-    Write-Output "  - which: Finds the location of a command."
-    Write-Output "  - head: Displays the first 'n' lines of a file."
-    Write-Output "  - tail: Displays the last 'n' lines of a file."
-    Write-Output "  - nf: Creates a new file in the current directory."
-    Write-Output "  - mkcd: Creates a new directory and changes to it."
+    Write-Output "  - unzip: Extracts a zip file to the specified directory. Usage: unzip 'file.zip'"
+    Write-Output "  - grep: Searches for patterns in files. Usage: grep 'regex' 'path'"
+    Write-Output "  - df: Displays disk space usage. Usage: df"
+    Write-Output "  - sed: Replaces text in a file. Usage: sed 'file' 'find' 'replace'"
+    Write-Output "  - which: Finds the location of a command. Usage: which 'cmd'"
+    Write-Output "  - head: Displays the first 'n' lines of a file. Usage: head 'file' 10"
+    Write-Output "  - tail: Displays the last 'n' lines of a file. Usage: tail 'file' 10"
+    Write-Output "  - nf: Creates a new file. Usage: nf 'filename'"
+    Write-Output "  - mkcd: Creates a new directory and changes to it. Usage: mkcd 'dirname'"
+    Write-Output "  - touch: Creates or updates the timestamp of a file. Usage: touch 'file'"
+    Write-Output "  - ff: Finds files containing a string in their names. Usage: ff 'pattern'"
 
     # Process Management
     Write-Host "`nProcess Management:" -ForegroundColor Green
-    Write-Output "  - pkill: Terminates processes with the specified name."
-    Write-Output "  - pgrep: Lists all processes with the specified name."
-    Write-Output "  - k9: Force stops a process by name."
+    Write-Output "  - pkill: Terminates processes by name. Usage: pkill 'processName'"
+    Write-Output "  - pgrep: Lists all processes by name. Usage: pgrep 'processName'"
+    Write-Output "  - k9: Force stops a process by name. Usage: k9 'processName'"
 
     # Git Utilities
     Write-Host "`nGit Utilities:" -ForegroundColor Green
-    Write-Output "  - gs: Runs the 'git status' command."
-    Write-Output "  - ga: Stages all changes in git."
-    Write-Output "  - gc: Commits staged changes in git with a provided message."
-    Write-Output "  - gp: Pushes committed changes to the remote git repository."
-    Write-Output "  - g: Navigates to the GitHub directory."
-    Write-Output "  - gcom: Stages and commits all changes in git with a specified message."
-    Write-Output "  - lazyg: Stages, commits, and pushes all changes in git with a specified message."
+    Write-Output "  - gs: Runs the 'git status' command. Usage: gs"
+    Write-Output "  - ga: Stages all changes in git. Usage: ga"
+    Write-Output "  - gc: Commits staged changes in git with a provided message. Usage: gc 'message'"
+    Write-Output "  - gp: Pushes committed changes to a remote git repository. Usage: gp"
+    Write-Output "  - g: Navigates to the GitHub directory. Usage: g"
+    Write-Output "  - gcom: Stages and commits all changes in git with a specified message. Usage: gcom 'message'"
+    Write-Output "  - lazyg: Stages, commits, and pushes all changes in git. Usage: lazyg 'message'"
 
     # Clipboard Utilities
     Write-Host "`nClipboard Utilities:" -ForegroundColor Green
-    Write-Output "  - cpy: Copies the specified text to the clipboard."
-    Write-Output "  - pst: Retrieves the current content of the clipboard."
-    Write-Output "  - CopyCsvToClipboard: Copies the contents of a specified CSV file to the clipboard."
+    Write-Output "  - cpy: Copies text to the clipboard. Usage: cpy 'text'"
+    Write-Output "  - pst: Retrieves the current content of the clipboard. Usage: pst"
+    Write-Output "  - CopyCsvToClipboard: Copies contents of a CSV file to the clipboard. Usage: CopyCsvToClipboard 'file.csv'"
 
     # Navigation Shortcuts
     Write-Host "`nNavigation Shortcuts:" -ForegroundColor Green
-    Write-Output "  - docs: Navigates to the Documents folder."
-    Write-Output "  - dtop: Navigates to the Desktop folder."
-    Write-Output "  - ep: Opens the current PowerShell profile in the default editor."
+    Write-Output "  - docs: Navigates to the Documents folder. Usage: docs"
+    Write-Output "  - dtop: Navigates to the Desktop folder. Usage: dtop"
+    Write-Output "  - ep: Opens the current PowerShell profile in the editor. Usage: ep"
 
     # Listing and Formatting
     Write-Host "`nListing and Formatting:" -ForegroundColor Green
-    Write-Output "  - la: Lists all items in the current directory including hidden ones, formatted as a table."
-    Write-Output "  - ll: Lists all items including hidden ones, providing detailed information."
+    Write-Output "  - la: Lists all items in the current directory, formatted as a table. Usage: la"
+    Write-Output "  - ll: Lists all items, providing detailed information. Usage: ll"
 }
