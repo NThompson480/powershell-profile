@@ -12,15 +12,25 @@ if ($PSVersion -ge 6) {
 }
 
 # Import Modules and External Profiles
-# Ensure Terminal-Icons module is installed before importing
-if (-not (Get-Module -ListAvailable -Name Terminal-Icons)) {
-    Install-Module -Name Terminal-Icons -Scope CurrentUser -Force -SkipPublisherCheck
+function Ensure-ImportModule {
+    param ([string]$ModuleName, [string]$ModulePath = $null)
+    if (-not (Get-Module -ListAvailable -Name $ModuleName)) {
+        Install-Module -Name $ModuleName -Scope CurrentUser -Force -ErrorAction Stop
+        Write-Host "$ModuleName installed."
+    } else { Write-Host "$ModuleName is already installed." }
+    try {
+        Import-Module -Name ($ModulePath -if $ModulePath -else $ModuleName) -ErrorAction Stop
+        Write-Host "$ModuleName imported successfully."
+    } catch { Write-Error "Failed to import $ModuleName. Error: $_" }
 }
-Import-Module -Name Terminal-Icons
-$ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
-if (Test-Path($ChocolateyProfile)) {
-    Import-Module "$ChocolateyProfile"
-}
+
+$modules = @(
+    @{ Name = "Terminal-Icons"; Path = $null },
+    @{ Name = "ChocolateyProfile"; Path = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1" },
+    @{ Name = "z"; Path = $null }
+)
+
+foreach ($module in $modules) { Ensure-ImportModule -ModuleName $module.Name -ModulePath $module.Path }
 
 # Check for Profile Updates
 function UpdateProfile {
