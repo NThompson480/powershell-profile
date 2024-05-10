@@ -15,22 +15,29 @@ if ($PSVersion -ge 6) {
 function Ensure-ImportModule {
     param ([string]$ModuleName, [string]$ModulePath = $null)
     if (-not (Get-Module -ListAvailable -Name $ModuleName)) {
-        Install-Module -Name $ModuleName -Scope CurrentUser -Force -ErrorAction Stop
+        Install-Module -Name $ModuleName -Scope CurrentUser -Force -ErrorAction Continue
         Write-Host "$ModuleName installed."
-    } else { Write-Host "$ModuleName is already installed." }
+    } else {
+        Write-Host "$ModuleName is already installed."
+    }
     try {
-        Import-Module -Name ($ModulePath ? $ModulePath : $ModuleName) -ErrorAction Stop
+        $importName = $ModulePath -if $ModulePath -else $ModuleName
+        Import-Module -Name $importName -ErrorAction Stop
         Write-Host "$ModuleName imported successfully."
-    } catch { Write-Error "Failed to import $ModuleName. Error: $_" }
+    } catch {
+        Write-Error "Failed to import $ModuleName. Error: $_"
+    }
 }
 
 $modules = @(
     @{ Name = "Terminal-Icons"; Path = $null },
-    @{ Name = "chocolateyProfile"; Path = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1" },
-    @{ Name = "z"; Path = $null }
+    @{ Name = "z"; Path = $null },
+    @{ Name = "ChocolateyProfile"; Path = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1" }
 )
 
-foreach ($module in $modules) { Ensure-ImportModule -ModuleName $module.Name -ModulePath $module.Path }
+foreach ($module in $modules) {
+    Ensure-ImportModule -ModuleName $module.Name -ModulePath $module.Path
+}
 
 # Check for Profile Updates
 function UpdateProfile {
