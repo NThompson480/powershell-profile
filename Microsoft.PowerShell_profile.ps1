@@ -59,7 +59,7 @@ function UpdateProfile {
 
     try {
         $url = "https://raw.githubusercontent.com/NThompson480/powershell-profile/main/Microsoft.PowerShell_profile.ps1"
-        Write-Host "Downloading the latest profile from GitHub..." -ForegroundColor Cyan
+        Write-Host "Verifying the latest profile from GitHub..." -ForegroundColor Cyan
         $oldhash = Get-FileHash $PROFILE -ErrorAction SilentlyContinue
 
         if ($oldhash) {
