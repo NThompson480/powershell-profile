@@ -11,6 +11,50 @@ if ($PSVersion -ge 6) {
     $canConnectToGitHub = Test-Connection github.com -Count 1 -Quiet
 }
 
+function UpdatePowerShell {
+    # Only proceed if PowerShell version is 7 or higher
+    if ($PSVersionTable.PSVersion.Major -lt 7) {
+        # Write-Host "This function is intended for PowerShell Core 7 or newer." -ForegroundColor Yellow
+        return
+    }
+
+    if (-not $global:canConnectToGitHub) {
+        Write-Host "Skipping PowerShell update check due to GitHub.com not responding within 1 second." -ForegroundColor Yellow
+        return
+    }
+
+    try {
+        Write-Host "Checking for PowerShell updates..." -ForegroundColor Cyan
+        $updateNeeded = $false
+        $currentVersion = $PSVersionTable.PSVersion.ToString()
+        $gitHubApiUrl = "https://api.github.com/repos/PowerShell/PowerShell/releases/latest"
+        $latestReleaseInfo = Invoke-RestMethod -Uri $gitHubApiUrl
+        $latestVersion = $latestReleaseInfo.tag_name.Trim('v')
+
+        if ($currentVersion -lt $latestVersion) {
+            $updateNeeded = $true
+        }
+
+        if ($updateNeeded) {
+            Write-Host "Downloading the latest PowerShell..." -ForegroundColor Yellow
+            $asset = $latestReleaseInfo.assets | Where-Object { $_.name -like "*win-x64.msi" } # Assuming Windows 64-bit MSI installer
+            $downloadUrl = $asset.browser_download_url
+            $localPath = "$env:TEMP\PowerShell-latest.msi"
+            Invoke-WebRequest -Uri $downloadUrl -OutFile $localPath
+
+            Write-Host "Installing the latest PowerShell..." -ForegroundColor Yellow
+            Start-Process msiexec.exe -ArgumentList "/i `"$localPath`" /quiet /norestart" -Wait
+
+            Write-Host "PowerShell has been updated. Please restart your shell to reflect changes." -ForegroundColor Magenta
+        } else {
+            Write-Host "Your PowerShell is up to date." -ForegroundColor Green
+        }
+    } catch {
+        Write-Error "Failed to update PowerShell. Error: $_"
+    }
+}
+UpdatePowerShell
+
 # Import Modules and External Profiles
 function Ensure-ImportModule {
     param ([string]$ModuleName, [string]$ModulePath = $null)
@@ -87,50 +131,6 @@ function UpdateProfile {
     }
 }
 UpdateProfile
-
-function UpdatePowerShell {
-    # Only proceed if PowerShell version is 7 or higher
-    if ($PSVersionTable.PSVersion.Major -lt 7) {
-        # Write-Host "This function is intended for PowerShell Core 7 or newer." -ForegroundColor Yellow
-        return
-    }
-
-    if (-not $global:canConnectToGitHub) {
-        Write-Host "Skipping PowerShell update check due to GitHub.com not responding within 1 second." -ForegroundColor Yellow
-        return
-    }
-
-    try {
-        Write-Host "Checking for PowerShell updates..." -ForegroundColor Cyan
-        $updateNeeded = $false
-        $currentVersion = $PSVersionTable.PSVersion.ToString()
-        $gitHubApiUrl = "https://api.github.com/repos/PowerShell/PowerShell/releases/latest"
-        $latestReleaseInfo = Invoke-RestMethod -Uri $gitHubApiUrl
-        $latestVersion = $latestReleaseInfo.tag_name.Trim('v')
-
-        if ($currentVersion -lt $latestVersion) {
-            $updateNeeded = $true
-        }
-
-        if ($updateNeeded) {
-            Write-Host "Downloading the latest PowerShell..." -ForegroundColor Yellow
-            $asset = $latestReleaseInfo.assets | Where-Object { $_.name -like "*win-x64.msi" } # Assuming Windows 64-bit MSI installer
-            $downloadUrl = $asset.browser_download_url
-            $localPath = "$env:TEMP\PowerShell-latest.msi"
-            Invoke-WebRequest -Uri $downloadUrl -OutFile $localPath
-
-            Write-Host "Installing the latest PowerShell..." -ForegroundColor Yellow
-            Start-Process msiexec.exe -ArgumentList "/i `"$localPath`" /quiet /norestart" -Wait
-
-            Write-Host "PowerShell has been updated. Please restart your shell to reflect changes." -ForegroundColor Magenta
-        } else {
-            Write-Host "Your PowerShell is up to date." -ForegroundColor Green
-        }
-    } catch {
-        Write-Error "Failed to update PowerShell. Error: $_"
-    }
-}
-UpdatePowerShell
 
 Set-PSReadLineOption -PredictionViewStyle ListView
 Set-PSReadLineOption -EditMode Windows
