@@ -172,6 +172,10 @@ function FlushDNS {
 }
 
 # File Management
+function OpenDir {
+    Start-Process explorer.exe -ArgumentList $PWD
+}
+
 function touch($file) { "" | Out-File $file -Encoding ASCII }
 
 function ff($name) {
@@ -313,6 +317,7 @@ function ShowFunctions {
 
     # File Management
     Write-Host "`nFile Management:" -ForegroundColor Green
+    Write-Output "  - OpenDir: Opens the current directory in Windows Explorer. Usage: OpenDir"
     Write-Output "  - unzip: Extracts a zip file to the specified directory. Usage: unzip 'file.zip'"
     Write-Output "  - grep: Searches for patterns in files. Usage: grep 'regex' 'path'"
     Write-Output "  - df: Displays disk space usage. Usage: df"
