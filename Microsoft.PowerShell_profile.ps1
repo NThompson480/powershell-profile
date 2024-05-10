@@ -90,7 +90,7 @@ function Ensure-ImportModule {
         }
         try {
             Import-Module -Name $ModuleName -ErrorAction Stop
-            3 Write-Host "$ModuleName imported successfully." -ForegroundColor Green
+            # Write-Host "$ModuleName imported successfully." -ForegroundColor Green
         } catch {
             Write-Error "Failed to import $ModuleName. Error: $_"
         }
