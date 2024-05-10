@@ -29,8 +29,6 @@ function Ensure-ImportModule {
             } catch {
                 Write-Error "Failed to install $ModuleName. Error: $_"
             }
-        } else {
-            Write-Host "$ModuleName is already installed."
         }
         try {
             Import-Module -Name $ModuleName -ErrorAction Stop
@@ -85,11 +83,7 @@ function UpdateProfile {
         Write-Error "Failed to check or update profile. Error: $_"
     } finally {
         if (Test-Path $tempFile) {
-            Write-Host "Cleaning up temporary files..." -ForegroundColor Cyan
             Remove-Item $tempFile -ErrorAction SilentlyContinue
-            Write-Host "Cleanup complete." -ForegroundColor Green
-        } else {
-            Write-Host "No temporary files to clean up." -ForegroundColor Green
         }
     }
 }
