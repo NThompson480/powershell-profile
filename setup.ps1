@@ -208,3 +208,19 @@ function Ensure-PSReadLineInstalled {
     }
 }
 Ensure-PSReadLineInstalled
+
+function Ensure-ZInstalled {
+    try {
+        $psReadLineModule = Get-Module -Name PSReadLine -ListAvailable
+        if (-not $psReadLineModule) {
+            Write-Host "PSReadLine is not installed. Installing now..."
+            Install-Module -Name Z -Force -Scope CurrentUser
+            Write-Host "PSReadLine installed successfully."
+        } else {
+            Write-Host "PSReadLine is already installed."
+        }
+    } catch {
+        Write-Error "Failed to manage PSReadLine module. Error: $_"
+    }
+}
+Ensure-ZInstalled
