@@ -228,8 +228,8 @@ function lazyg {
 function cpy { Set-Clipboard $args[0] }
 function pst { Get-Clipboard }
 function CopyCsvToClipboard {
-    if (-Not (Test-Path $csvPath)) { Write-Error "File not found: $csvPath"; return }
-    Get-Content $csvPath | Set-Clipboard
+    if (-Not (Test-Path $args[0])) { Write-Error "File not found: $args[0]"; return }
+    Get-Content $args[0] | Set-Clipboard
     Write-Host "CSV content from '$csvPath' has been copied to the clipboard." -ForegroundColor Green
 }
 
