@@ -175,9 +175,9 @@ function FlushDNS {
 function touch($file) { "" | Out-File $file -Encoding ASCII }
 
 function ff($name) {
-    Get-ChildItem -recurse -filter "*${name}*" -ErrorAction SilentlyContinue | ForEach-Object {
-        Write-Output "$($_.directory)\$($_)"
-    }
+    $items = Get-ChildItem -Recurse -Filter "*${name}*" -ErrorAction SilentlyContinue; 
+    if ($items) { $items | ForEach-Object { Write-Output $_.FullName } } 
+    else { Write-Output "No files found matching *${name}*." }
 }
 
 function unzip($file) {
