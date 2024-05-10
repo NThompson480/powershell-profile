@@ -17,7 +17,7 @@ function Ensure-ImportModule {
     if ($ModulePath) {
         try {
             Import-Module -Name $ModulePath -ErrorAction Stop
-            Write-Host "$ModuleName imported successfully from path."
+            Write-Host "$ModuleName imported successfully from path." -ForegroundColor Green
         } catch {
             Write-Error "Failed to import $ModuleName from path. Error: $_"
         }
