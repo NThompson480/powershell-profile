@@ -49,8 +49,17 @@ foreach ($module in $modules) { Ensure-ImportModule -ModuleName $module.Name -Mo
 
 # Check for Profile Updates
 function UpdateProfile {
-    if (-not $global:canConnectToGitHub) {
-        Write-Host "Skipping profile update check due to GitHub.com not responding within 1 second." -ForegroundColor Yellow
+    param (
+        [switch]$ForceUpdate = $false
+    )
+
+    $lastUpdated = (Get-Item $PROFILE).LastWriteTime
+    $timeSinceUpdate = (Get-Date) - $lastUpdated
+
+    if ($timeSinceUpdate.TotalDays -lt 1 -and -not $ForceUpdate) {
+        $hours = [Math]::Floor($timeSinceUpdate.TotalHours)
+        $minutes = [Math]::Floor($timeSinceUpdate.TotalMinutes) % 60
+        Write-Host "Your PowerShell profile was last updated $hours hour(s) and $minutes minute(s) ago. You can issue an 'UpdateProfile -ForceUpdate' to check GitHub again now." -ForegroundColor Green
         return
     }
 
@@ -59,19 +68,12 @@ function UpdateProfile {
 
     try {
         $url = "https://raw.githubusercontent.com/NThompson480/powershell-profile/main/Microsoft.PowerShell_profile.ps1"
-        $oldhash = Get-FileHash $PROFILE -ErrorAction SilentlyContinue
-
-        if ($oldhash) {
-            Write-Host "Current profile hash: $($oldhash.Hash)" -ForegroundColor Gray
-        } else {
-            Write-Host "No existing profile hash found (possibly new installation)." -ForegroundColor Yellow
-        }
-
         Invoke-RestMethod $url -OutFile $tempFile
-        $newhash = Get-FileHash $tempFile
-        Write-Host "Latest profile hash: $($newhash.Hash)" -ForegroundColor Gray
 
-        if ($newhash.Hash -ne $oldhash.Hash) {
+        $oldhash = Get-FileHash $PROFILE -ErrorAction SilentlyContinue
+        $newhash = Get-FileHash $tempFile
+
+        if ($oldhash.Hash -ne $newhash.Hash) {
             Write-Host "A new version of the profile has been detected. Updating profile..." -ForegroundColor Yellow
             Copy-Item -Path $tempFile -Destination $PROFILE -Force
             Write-Host "Profile has been updated successfully. Please restart your shell to reflect changes." -ForegroundColor Magenta
@@ -81,9 +83,7 @@ function UpdateProfile {
     } catch {
         Write-Error "Failed to check or update profile. Error: $_"
     } finally {
-        if (Test-Path $tempFile) {
-            Remove-Item $tempFile -ErrorAction SilentlyContinue
-        }
+        Remove-Item $tempFile -ErrorAction SilentlyContinue
     }
 }
 UpdateProfile
@@ -315,7 +315,7 @@ function ShowFunctions {
 
     # Profile Management
     Write-Host "`nProfile Management:" -ForegroundColor Green
-    Write-Output "  - UpdateProfile: Checks and updates the PowerShell profile from GitHub. Usage: UpdateProfile"
+    Write-Output "  - UpdateProfile: Checks and updates the PowerShell profile from GitHub. Usage: UpdateProfile -ForceUpdate"
     Write-Output "  - EditProfile: Opens the current user's all hosts profile in the default editor. Usage: EditProfile"
     Write-Output "  - ReloadProfile: Reloads the PowerShell profile. Usage: ReloadProfile"
     Write-Output "  - UpdatePowerShell: Checks and updates PowerShell if a newer version is available. Usage: UpdatePowerShell"
