@@ -244,11 +244,10 @@ function lazyg {
 # Clipboard Utilities
 function cpy { Set-Clipboard $args[0] }
 function pst { Get-Clipboard }
-function CopyCsvToClipboard($csvPath) {
-    $resolvedPath = Resolve-Path $csvPath -ErrorAction SilentlyContinue
-    if (-Not $resolvedPath) { Write-Error "File not found: $csvPath"; return }
-    Get-Content $resolvedPath | Set-Clipboard
-    Write-Host "CSV content from '$resolvedPath' copied to clipboard." -ForegroundColor Green
+function CopyCsvToClipboard {
+    if (-Not (Test-Path $args[0])) { Write-Error "File not found: $($args[0])"; return }
+    Get-Content $args[0] | Set-Clipboard
+    Write-Host "CSV content from '$($args[0])' has been copied to the clipboard." -ForegroundColor Green
 }
 
 # Navigation Shortcuts
