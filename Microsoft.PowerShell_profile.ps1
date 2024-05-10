@@ -14,22 +14,30 @@ if ($PSVersion -ge 6) {
 # Import Modules and External Profiles
 function Ensure-ImportModule {
     param ([string]$ModuleName, [string]$ModulePath = $null)
-    if (-not (Get-Module -ListAvailable -Name $ModuleName)) {
-        Install-Module -Name $ModuleName -Scope CurrentUser -Force -ErrorAction Continue
-        Write-Host "$ModuleName installed."
-    } else {
-        Write-Host "$ModuleName is already installed."
-    }
-    try {
-        if ($ModulePath) {
-            $importName = $ModulePath
-        } else {
-            $importName = $ModuleName
+    if ($ModulePath) {
+        try {
+            Import-Module -Name $ModulePath -ErrorAction Stop
+            Write-Host "$ModuleName imported successfully from path."
+        } catch {
+            Write-Error "Failed to import $ModuleName from path. Error: $_"
         }
-        Import-Module -Name $importName -ErrorAction Stop
-        Write-Host "$ModuleName imported successfully."
-    } catch {
-        Write-Error "Failed to import $ModuleName. Error: $_"
+    } else {
+        if (-not (Get-Module -ListAvailable -Name $ModuleName)) {
+            try {
+                Install-Module -Name $ModuleName -Scope CurrentUser -Force -ErrorAction Stop
+                Write-Host "$ModuleName installed."
+            } catch {
+                Write-Error "Failed to install $ModuleName. Error: $_"
+            }
+        } else {
+            Write-Host "$ModuleName is already installed."
+        }
+        try {
+            Import-Module -Name $ModuleName -ErrorAction Stop
+            Write-Host "$ModuleName imported successfully."
+        } catch {
+            Write-Error "Failed to import $ModuleName. Error: $_"
+        }
     }
 }
 
@@ -39,9 +47,7 @@ $modules = @(
     @{ Name = "ChocolateyProfile"; Path = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1" }
 )
 
-foreach ($module in $modules) {
-    Ensure-ImportModule -ModuleName $module.Name -ModulePath $module.Path
-}
+foreach ($module in $modules) { Ensure-ImportModule -ModuleName $module.Name -ModulePath $module.Path }
 
 # Check for Profile Updates
 function UpdateProfile {
