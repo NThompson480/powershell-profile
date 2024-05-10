@@ -18,7 +18,7 @@ function UpdatePowerShell {
 
     $updateStatusFile = "$env:TEMP\PowerShellUpdateStatus.txt"
 
-    if (Test-Path $updateStatusFile -and -not $ForceUpdate) {
+    if (Test-Path $updateStatusFile -and (-not $ForceUpdate)) {
         $lastUpdated = Get-Content $updateStatusFile
         $timeSinceUpdate = (Get-Date) - [datetime]$lastUpdated
         if ($timeSinceUpdate.TotalHours -lt 24) {
