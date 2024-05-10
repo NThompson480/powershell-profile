@@ -18,11 +18,11 @@ function UpdatePowerShell {
 
     $updateStatusFile = "$env:TEMP\PowerShellUpdateStatus.txt"
 
-    if (Test-Path $updateStatusFile -and (-not $ForceUpdate)) {
+    if ((Test-Path $updateStatusFile) -and (-not $ForceUpdate)) {
         $lastUpdated = Get-Content $updateStatusFile
         $timeSinceUpdate = (Get-Date) - [datetime]$lastUpdated
         if ($timeSinceUpdate.TotalHours -lt 24) {
-            Write-Host "Last checked for PowerShell updates less than 24 hours ago." -ForegroundColor Green
+            # Write-Host "Last checked for PowerShell updates less than 24 hours ago." -ForegroundColor Green
             return
         }
     }
@@ -75,7 +75,7 @@ function Ensure-ImportModule {
     if ($ModulePath) {
         try {
             Import-Module -Name $ModulePath -ErrorAction Stop
-            Write-Host "$ModuleName imported successfully from path." -ForegroundColor Green
+            3 Write-Host "$ModuleName imported successfully from path." -ForegroundColor Green
         } catch {
             Write-Error "Failed to import $ModuleName from path. Error: $_"
         }
@@ -90,7 +90,7 @@ function Ensure-ImportModule {
         }
         try {
             Import-Module -Name $ModuleName -ErrorAction Stop
-            Write-Host "$ModuleName imported successfully." -ForegroundColor Green
+            3 Write-Host "$ModuleName imported successfully." -ForegroundColor Green
         } catch {
             Write-Error "Failed to import $ModuleName. Error: $_"
         }
@@ -118,7 +118,7 @@ function UpdateProfile {
     if ($timeSinceUpdate.TotalDays -lt 1 -and -not $ForceUpdate) {
         $nextUpdateInHours = [Math]::Floor((24 - $timeSinceUpdate.TotalHours))
         $nextUpdateInMinutes = [Math]::Floor((60 - $timeSinceUpdate.TotalMinutes) % 60)
-        Write-Host "Next profile update will be due in $nextUpdateInHours hour(s) and $nextUpdateInMinutes minute(s). Use 'UpdateProfile -ForceUpdate' to update now." -ForegroundColor Green
+        Write-Host "Next profile update: $nextUpdateInHours hour(s) and $nextUpdateInMinutes minute(s). Use 'UpdateProfile -ForceUpdate' to update now."
         return
     }
 
