@@ -211,16 +211,16 @@ Ensure-PSReadLineInstalled
 
 function Ensure-ZInstalled {
     try {
-        $psReadLineModule = Get-Module -Name PSReadLine -ListAvailable
-        if (-not $psReadLineModule) {
-            Write-Host "PSReadLine is not installed. Installing now..."
+        $ZModule = Get-Module -Name Z -ListAvailable
+        if (-not $ZModule) {
+            Write-Host "Z is not installed. Installing now..."
             Install-Module -Name Z -Force -Scope CurrentUser
-            Write-Host "PSReadLine installed successfully."
+            Write-Host "Z installed successfully."
         } else {
-            Write-Host "PSReadLine is already installed."
+            Write-Host "Z is already installed."
         }
     } catch {
-        Write-Error "Failed to manage PSReadLine module. Error: $_"
+        Write-Error "Failed to manage Z module. Error: $_"
     }
 }
 Ensure-ZInstalled
