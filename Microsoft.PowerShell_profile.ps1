@@ -26,7 +26,7 @@ function Ensure-ImportModule {
 
 $modules = @(
     @{ Name = "Terminal-Icons"; Path = $null },
-    @{ Name = "ChocolateyProfile"; Path = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1" },
+    @{ Name = "chocolateyProfile"; Path = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1" },
     @{ Name = "z"; Path = $null }
 )
 
