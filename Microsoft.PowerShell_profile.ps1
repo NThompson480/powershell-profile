@@ -279,7 +279,7 @@ Set-PSReadLineOption -Colors @{
 }
 
 ## Set prompt
-$themeFileName = "oh-my-posh-cinnamon.json"
+$themeFileName = "cinnamon.omp.json"
 $localConfigPath = Join-Path (Split-Path -Parent $PROFILE) $themeFileName
 if (-Not (Test-Path $localConfigPath)) {
     Invoke-WebRequest "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/$themeFileName" -OutFile $localConfigPath
