@@ -19,7 +19,7 @@ function Ensure-ImportModule {
         Write-Host "$ModuleName installed."
     } else { Write-Host "$ModuleName is already installed." }
     try {
-        Import-Module -Name ($ModulePath -if $ModulePath -else $ModuleName) -ErrorAction Stop
+        Import-Module -Name ($ModulePath ? $ModulePath : $ModuleName) -ErrorAction Stop
         Write-Host "$ModuleName imported successfully."
     } catch { Write-Error "Failed to import $ModuleName. Error: $_" }
 }
