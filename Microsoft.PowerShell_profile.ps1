@@ -12,9 +12,22 @@ if ($PSVersion -ge 6) {
 }
 
 function UpdatePowerShell {
-    # Only proceed if PowerShell version is 7 or higher
+    param (
+        [switch]$ForceUpdate = $false
+    )
+
+    $updateStatusFile = "$env:TEMP\PowerShellUpdateStatus.txt"
+
+    if (Test-Path $updateStatusFile -and -not $ForceUpdate) {
+        $lastUpdated = Get-Content $updateStatusFile
+        $timeSinceUpdate = (Get-Date) - [datetime]$lastUpdated
+        if ($timeSinceUpdate.TotalHours -lt 24) {
+            Write-Host "Last checked for PowerShell updates less than 24 hours ago." -ForegroundColor Green
+            return
+        }
+    }
+
     if ($PSVersionTable.PSVersion.Major -lt 7) {
-        # Write-Host "This function is intended for PowerShell Core 7 or newer." -ForegroundColor Yellow
         return
     }
 
@@ -36,7 +49,7 @@ function UpdatePowerShell {
 
         if ($updateNeeded) {
             Write-Host "Downloading the latest PowerShell..." -ForegroundColor Yellow
-            $asset = $latestReleaseInfo.assets | Where-Object { $_.name -like "*win-x64.msi" } # Assuming Windows 64-bit MSI installer
+            $asset = $latestReleaseInfo.assets | Where-Object { $_.name -like "*win-x64.msi" }
             $downloadUrl = $asset.browser_download_url
             $localPath = "$env:TEMP\PowerShell-latest.msi"
             Invoke-WebRequest -Uri $downloadUrl -OutFile $localPath
@@ -50,6 +63,8 @@ function UpdatePowerShell {
         }
     } catch {
         Write-Error "Failed to update PowerShell. Error: $_"
+    } finally {
+        Set-Content -Path $updateStatusFile -Value (Get-Date).ToString()
     }
 }
 UpdatePowerShell
