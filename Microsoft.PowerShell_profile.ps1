@@ -266,7 +266,7 @@ if (Get-Command zoxide -ErrorAction SilentlyContinue) {
     }
 }
 
-function Show-Functions {
+function ShowFunctions {
     Write-Host "Available custom functions with descriptions:" -ForegroundColor Cyan
 
     # Profile Management
