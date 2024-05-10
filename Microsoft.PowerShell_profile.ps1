@@ -23,7 +23,7 @@ if (Test-Path($ChocolateyProfile)) {
 }
 
 # Check for Profile Updates
-function update-profile {
+function UpdateProfile {
     if (-not $global:canConnectToGitHub) {
         Write-Host "Skipping profile update check due to GitHub.com not responding within 1 second." -ForegroundColor Yellow
         return
@@ -66,9 +66,9 @@ function update-profile {
         }
     }
 }
-update-profile
+UpdateProfile
 
-function update-powershell {
+function UpdatePowerShell {
     # Only proceed if PowerShell version is 7 or higher
     if ($PSVersionTable.PSVersion.Major -lt 7) {
         # Write-Host "This function is intended for PowerShell Core 7 or newer." -ForegroundColor Yellow
@@ -110,7 +110,7 @@ function update-powershell {
         Write-Error "Failed to update PowerShell. Error: $_"
     }
 }
-update-powershell
+UpdatePowerShell
 
 # Admin Check and Prompt Customization
 $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
@@ -120,16 +120,16 @@ function prompt {
 $adminSuffix = if ($isAdmin) { " [ADMIN]" } else { "" }
 $Host.UI.RawUI.WindowTitle = "PowerShell {0}$adminSuffix" -f $PSVersionTable.PSVersion.ToString()
 
-function edit-profile {
+function EditProfile {
     vim $PROFILE.CurrentUserAllHosts
 }
 
-function reload-profile {
+function ReloadProfile {
     & $profile
 }
 
 # System Utilities
-function uptime {
+function Uptime {
     if ($PSVersionTable.PSVersion.Major -eq 5) {
         $os = Get-WmiObject win32_operatingsystem
         $uptime = $os.ConvertToDateTime($os.lastbootuptime)
@@ -141,16 +141,16 @@ function uptime {
     }
 }
 
-function sysinfo {
+function Sysinfo {
     Get-ComputerInfo
 }
 
 # Network Utilities
-function get-pubip {
+function GetPublicIP {
     (Invoke-WebRequest http://ifconfig.me/ip).Content
 }
 
-function flushdns {
+function FlushDNS {
     Clear-DnsClientCache
 }
 
@@ -227,6 +227,11 @@ function lazyg {
 # Clipboard Utilities
 function cpy { Set-Clipboard $args[0] }
 function pst { Get-Clipboard }
+function CopyCsvToClipboard {
+    if (-Not (Test-Path $csvPath)) { Write-Error "File not found: $csvPath"; return }
+    Get-Content $csvPath | Set-Clipboard
+    Write-Host "CSV content from '$csvPath' has been copied to the clipboard." -ForegroundColor Green
+}
 
 # Navigation Shortcuts
 function docs { Set-Location -Path $HOME\Documents }
@@ -266,20 +271,20 @@ function Show-Functions {
 
     # Profile Management
     Write-Host "`nProfile Management:" -ForegroundColor Green
-    Write-Output "  - update-profile: Checks and updates the PowerShell profile from GitHub if a new version is detected."
-    Write-Output "  - edit-profile: Opens the current user's all hosts profile in the default editor."
-    Write-Output "  - reload-profile: Reloads the PowerShell profile."
-    Write-Output "  - update-powershell: Checks for the latest version of PowerShell and updates it if a newer version is available."
+    Write-Output "  - UpdateProfile: Checks and updates the PowerShell profile from GitHub if a new version is detected."
+    Write-Output "  - EditProfile: Opens the current user's all hosts profile in the default editor."
+    Write-Output "  - ReloadProfile: Reloads the PowerShell profile."
+    Write-Output "  - UpdatePowershell: Checks for the latest version of PowerShell and updates it if a newer version is available."
 
     # System Utilities
     Write-Host "`nSystem Utilities:" -ForegroundColor Green
-    Write-Output "  - uptime: Shows the system uptime."
-    Write-Output "  - sysinfo: Retrieves detailed system information."
+    Write-Output "  - Uptime: Shows the system uptime."
+    Write-Output "  - Sysinfo: Retrieves detailed system information."
 
     # Network Utilities
     Write-Host "`nNetwork Utilities:" -ForegroundColor Green
-    Write-Output "  - get-pubip: Retrieves the public IP address of the current connection."
-    Write-Output "  - flushdns: Clears the DNS client cache."
+    Write-Output "  - GetPublicIP: Retrieves the public IP address of the current connection."
+    Write-Output "  - FlushDNS: Clears the DNS client cache."
 
     # File Management
     Write-Host "`nFile Management:" -ForegroundColor Green
@@ -313,6 +318,7 @@ function Show-Functions {
     Write-Host "`nClipboard Utilities:" -ForegroundColor Green
     Write-Output "  - cpy: Copies the specified text to the clipboard."
     Write-Output "  - pst: Retrieves the current content of the clipboard."
+    Write-Output "  - CopyCsvToClipboard: Copies the contents of a specified CSV file to the clipboard."
 
     # Navigation Shortcuts
     Write-Host "`nNavigation Shortcuts:" -ForegroundColor Green
