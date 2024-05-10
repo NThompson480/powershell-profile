@@ -21,7 +21,11 @@ function Ensure-ImportModule {
         Write-Host "$ModuleName is already installed."
     }
     try {
-        $importName = $ModulePath -if $ModulePath -else $ModuleName
+        if ($ModulePath) {
+            $importName = $ModulePath
+        } else {
+            $importName = $ModuleName
+        }
         Import-Module -Name $importName -ErrorAction Stop
         Write-Host "$ModuleName imported successfully."
     } catch {
