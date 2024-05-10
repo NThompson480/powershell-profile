@@ -11,46 +11,49 @@ if ($PSVersion -ge 6) {
     $canConnectToGitHub = Test-Connection github.com -Count 1 -Quiet
 }
 
-function UpdateProfile {
-    param (
-        [switch]$ForceUpdate = $false
-    )
-
-    $lastUpdated = (Get-Item $PROFILE).LastWriteTime
-    $timeSinceUpdate = (Get-Date) - $lastUpdated
-    $nextUpdateDue = $lastUpdated.AddDays(1)
-
-    if ($timeSinceUpdate.TotalDays -lt 1 -and -not $ForceUpdate) {
-        $nextUpdateInHours = [Math]::Floor((24 - $timeSinceUpdate.TotalHours))
-        $nextUpdateInMinutes = [Math]::Floor((60 - $timeSinceUpdate.TotalMinutes) % 60)
-        Write-Host "Next profile update will be due in $nextUpdateInHours hour(s) and $nextUpdateInMinutes minute(s). Use 'UpdateProfile -ForceUpdate' to update now." -ForegroundColor Green
+function UpdatePowerShell {
+    # Only proceed if PowerShell version is 7 or higher
+    if ($PSVersionTable.PSVersion.Major -lt 7) {
+        # Write-Host "This function is intended for PowerShell Core 7 or newer." -ForegroundColor Yellow
         return
     }
 
-    Write-Host "Initiating profile update check from GitHub......" -ForegroundColor Cyan
-    $tempFile = "$env:temp/Microsoft.PowerShell_profile.ps1"
+    if (-not $global:canConnectToGitHub) {
+        Write-Host "Skipping PowerShell update check due to GitHub.com not responding within 1 second." -ForegroundColor Yellow
+        return
+    }
 
     try {
-        $url = "https://raw.githubusercontent.com/NThompson480/powershell-profile/main/Microsoft.PowerShell_profile.ps1"
-        Invoke-RestMethod $url -OutFile $tempFile
+        Write-Host "Checking for PowerShell updates..." -ForegroundColor Cyan
+        $updateNeeded = $false
+        $currentVersion = $PSVersionTable.PSVersion.ToString()
+        $gitHubApiUrl = "https://api.github.com/repos/PowerShell/PowerShell/releases/latest"
+        $latestReleaseInfo = Invoke-RestMethod -Uri $gitHubApiUrl
+        $latestVersion = $latestReleaseInfo.tag_name.Trim('v')
 
-        $oldhash = Get-FileHash $PROFILE -ErrorAction SilentlyContinue
-        $newhash = Get-FileHash $tempFile
+        if ($currentVersion -lt $latestVersion) {
+            $updateNeeded = $true
+        }
 
-        if ($oldhash.Hash -ne $newhash.Hash) {
-            Write-Host "A new version of the profile has been detected. Updating profile..." -ForegroundColor Yellow
-            Copy-Item -Path $tempFile -Destination $PROFILE -Force
-            Write-Host "Profile has been updated successfully. Please restart your shell to reflect changes." -ForegroundColor Magenta
+        if ($updateNeeded) {
+            Write-Host "Downloading the latest PowerShell..." -ForegroundColor Yellow
+            $asset = $latestReleaseInfo.assets | Where-Object { $_.name -like "*win-x64.msi" } # Assuming Windows 64-bit MSI installer
+            $downloadUrl = $asset.browser_download_url
+            $localPath = "$env:TEMP\PowerShell-latest.msi"
+            Invoke-WebRequest -Uri $downloadUrl -OutFile $localPath
+
+            Write-Host "Installing the latest PowerShell..." -ForegroundColor Yellow
+            Start-Process msiexec.exe -ArgumentList "/i `"$localPath`" /quiet /norestart" -Wait
+
+            Write-Host "PowerShell has been updated. Please restart your shell to reflect changes." -ForegroundColor Magenta
         } else {
-            Write-Host "Your PowerShell profile is already up to date." -ForegroundColor Green
+            Write-Host "Your PowerShell is up to date." -ForegroundColor Green
         }
     } catch {
-        Write-Error "Failed to check or update profile. Error: $_"
-    } finally {
-        Remove-Item $tempFile -ErrorAction SilentlyContinue
+        Write-Error "Failed to update PowerShell. Error: $_"
     }
 }
-UpdateProfile
+UpdatePowerShell
 
 # Import Modules and External Profiles
 function Ensure-ImportModule {
@@ -96,11 +99,12 @@ function UpdateProfile {
 
     $lastUpdated = (Get-Item $PROFILE).LastWriteTime
     $timeSinceUpdate = (Get-Date) - $lastUpdated
+    $nextUpdateDue = $lastUpdated.AddDays(1)
 
     if ($timeSinceUpdate.TotalDays -lt 1 -and -not $ForceUpdate) {
-        $hours = [Math]::Floor($timeSinceUpdate.TotalHours)
-        $minutes = [Math]::Floor($timeSinceUpdate.TotalMinutes) % 60
-        Write-Host "PowerShell profile last updated $hours hour(s) and $minutes minute(s) ago. Use 'ReloadProfile' to check GitHub again now." -ForegroundColor Green
+        $nextUpdateInHours = [Math]::Floor((24 - $timeSinceUpdate.TotalHours))
+        $nextUpdateInMinutes = [Math]::Floor((60 - $timeSinceUpdate.TotalMinutes) % 60)
+        Write-Host "Next profile update will be due in $nextUpdateInHours hour(s) and $nextUpdateInMinutes minute(s). Use 'UpdateProfile -ForceUpdate' to update now." -ForegroundColor Green
         return
     }
 
