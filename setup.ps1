@@ -193,3 +193,18 @@ if ((Test-Path -Path $PROFILE) -and (Test-ChocolateyPackageInstalled -packageNam
     Write-Warning "Setup completed with errors. Please check the error messages above."
 }
 
+function Ensure-PSReadLineInstalled {
+    try {
+        $psReadLineModule = Get-Module -Name PSReadLine -ListAvailable
+        if (-not $psReadLineModule) {
+            Write-Host "PSReadLine is not installed. Installing now..."
+            Install-Module -Name PSReadLine -Force -Scope CurrentUser
+            Write-Host "PSReadLine installed successfully."
+        } else {
+            Write-Host "PSReadLine is already installed."
+        }
+    } catch {
+        Write-Error "Failed to manage PSReadLine module. Error: $_"
+    }
+}
+Ensure-PSReadLineInstalled
