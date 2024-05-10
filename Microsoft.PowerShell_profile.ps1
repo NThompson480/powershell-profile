@@ -128,6 +128,17 @@ function ReloadProfile {
     & $profile
 }
 
+# Editor Configuration
+$EDITOR = if (Test-CommandExists nvim) { 'nvim' }
+          elseif (Test-CommandExists pvim) { 'pvim' }
+          elseif (Test-CommandExists vim) { 'vim' }
+          elseif (Test-CommandExists vi) { 'vi' }
+          elseif (Test-CommandExists code) { 'code' }
+          elseif (Test-CommandExists notepad++) { 'notepad++' }
+          elseif (Test-CommandExists sublime_text) { 'sublime_text' }
+          else { 'notepad' }
+Set-Alias -Name vim -Value $EDITOR
+
 # System Utilities
 function Uptime {
     if ($PSVersionTable.PSVersion.Major -eq 5) {
@@ -227,8 +238,7 @@ function lazyg {
 # Clipboard Utilities
 function cpy { Set-Clipboard $args[0] }
 function pst { Get-Clipboard }
-function CopyCsvToClipboard {
-    $csvPath = $args[0]
+function CopyCsvToClipboard($csvPath) {
     $resolvedPath = Resolve-Path $csvPath -ErrorAction SilentlyContinue
     if (-Not $resolvedPath) { Write-Error "File not found: $csvPath"; return }
     Get-Content $resolvedPath | Set-Clipboard
@@ -290,6 +300,7 @@ function ShowFunctions {
 
     # File Management
     Write-Host "`nFile Management:" -ForegroundColor Green
+    Write-Output "  - vim: Open a file in text editor."
     Write-Output "  - unzip: Extracts a zip file to the current directory."
     Write-Output "  - grep: Searches for patterns matching a specified regex in files or standard input."
     Write-Output "  - df: Displays disk space usage for all mounted drives."
