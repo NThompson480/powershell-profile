@@ -118,7 +118,7 @@ function UpdateProfile {
     if ($timeSinceUpdate.TotalDays -lt 1 -and -not $ForceUpdate) {
         $nextUpdateInHours = [Math]::Floor((24 - $timeSinceUpdate.TotalHours))
         $nextUpdateInMinutes = [Math]::Floor((60 - $timeSinceUpdate.TotalMinutes) % 60)
-        Write-Host "Next profile update: $nextUpdateInHours hour(s) and $nextUpdateInMinutes minute(s). Use 'UpdateProfile -ForceUpdate' to update now."
+        Write-Host "Next profile update: $nextUpdateInHours hour(s) and $nextUpdateInMinutes minute(s). Use 'UpdateProfile -ForceUpdate' to update now." -ForegroundColor Magenta
         return
     }
 
