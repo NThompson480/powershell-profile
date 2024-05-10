@@ -129,13 +129,19 @@ function ReloadProfile {
 }
 
 # Editor Configuration
-$EDITOR = if (Test-CommandExists nvim) { 'nvim' }
-          elseif (Test-CommandExists pvim) { 'pvim' }
-          elseif (Test-CommandExists vim) { 'vim' }
-          elseif (Test-CommandExists vi) { 'vi' }
-          elseif (Test-CommandExists code) { 'code' }
-          elseif (Test-CommandExists notepad++) { 'notepad++' }
-          elseif (Test-CommandExists sublime_text) { 'sublime_text' }
+function TestCommandExists {
+    param($command)
+    $exists = $null -ne (Get-Command $command -ErrorAction SilentlyContinue)
+    return $exists
+}
+
+$EDITOR = if (TestCommandExists nvim) { 'nvim' }
+          elseif (TestCommandExists pvim) { 'pvim' }
+          elseif (TestCommandExists vim) { 'vim' }
+          elseif (TestCommandExists vi) { 'vi' }
+          elseif (TestCommandExists code) { 'code' }
+          elseif (TestCommandExists notepad++) { 'notepad++' }
+          elseif (TestCommandExists sublime_text) { 'sublime_text' }
           else { 'notepad' }
 Set-Alias -Name vim -Value $EDITOR
 
